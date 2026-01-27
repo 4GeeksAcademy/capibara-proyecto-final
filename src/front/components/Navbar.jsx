@@ -1,19 +1,34 @@
 import { Link } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer"; // Importamos el hook
 
 export const Navbar = () => {
+    // Nos conectamos al store para leer el carrito
+    const { store } = useGlobalReducer();
 
-	return (
-		<nav className="navbar navbar-light bg-light">
-			<div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">React Boilerplate</span>
-				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Check the Context in action</button>
-					</Link>
-				</div>
-			</div>
-		</nav>
-	);
+    return (
+        <nav className="navbar navbar-light bg-light">
+            <div className="container">
+                <Link to="/" className="text-decoration-none">
+                    {/* Puedes cambiar "ShoeStore" por el nombre de tu tienda */}
+                    <span className="navbar-brand mb-0 h1">👟 ShoeStore</span>
+                </Link>
+                
+                <div className="ml-auto">
+                    {/* Redirigimos al usuario a '/demo', que pronto convertiremos en la página del Carrito */}
+                    <Link to="/demo">
+                        <button className="btn btn-primary position-relative">
+                            <i className="fa-solid fa-cart-shopping"></i> Carrito
+                            
+                            {/* Este badge muestra el número de items si el carrito tiene algo */}
+                            {store.cart.length > 0 && (
+                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {store.cart.length}
+                                </span>
+                            )}
+                        </button>
+                    </Link>
+                </div>
+            </div>
+        </nav>
+    );
 };
