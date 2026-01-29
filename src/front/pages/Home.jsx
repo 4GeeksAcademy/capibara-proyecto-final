@@ -1,30 +1,41 @@
-import React, { useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
+import React, { useEffect } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { Link } from "react-router-dom"; // Importamos Link para poder navegar al detalle
 
 export const Home = () => {
+    const { store, dispatch } = useGlobalReducer();
 
-	const { store, dispatch } = useGlobalReducer()
+    const loadProducts = async () => {
+        try {
+            const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
+            // Validación de seguridad para la URL
+            if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file");
 
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
+            // 1. PETICIÓN A LA API
+            // Asegúrate de que en tu backend (Flask) tengas un endpoint '/api/products'
+            // que devuelva una lista de diccionarios (JSON).
+            const response = await fetch(backendUrl + "/api/products");
+            
+            if (!response.ok) {
+                throw new Error("No se pudieron cargar los productos. Revisa tu backend.");
+            }
 
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
+            const data = await response.json();
 
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
+            // 2. DISPATCH (GUARDAR EN EL STORE)
+            // Aquí usamos la acción 'load_products' que creamos en el paso anterior.
+            dispatch({ type: "load_products", payload: data });
 
-			return data
+        } catch (error) {
+            console.error("Error cargando productos:", error);
+        }
+    }
 
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
+    useEffect(() => {
+        // Ejecutamos la función apenas carga el componente
+        loadProducts();
+    }, []);
 
 	}
 
