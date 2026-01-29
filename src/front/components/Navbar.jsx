@@ -1,20 +1,19 @@
 import { Link } from "react-router-dom";
-import useGlobalReducer from "../hooks/useGlobalReducer"; // Importamos el hook
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Navbar = () => {
-    // Nos conectamos al store para leer el carrito
+    // Conexion del store para leer el carrito
     const { store } = useGlobalReducer();
 
     return (
         <nav className="navbar navbar-light bg-light">
             <div className="container">
                 <Link to="/" className="text-decoration-none">
-                    {/* Puedes cambiar "ShoeStore" por el nombre de tu tienda */}
                     <span className="navbar-brand mb-0 h1">👟 ShoeStore</span>
                 </Link>
                 
                 <div className="ml-auto">
-                    {/* Redirigimos al usuario a '/demo', que pronto convertiremos en la página del Carrito */}
+                    {/* Se redirige al usuario a '/demo', que será la página del Carrito */}
                     <Link to="/demo">
                         <button className="btn btn-primary position-relative">
                             <i className="fa-solid fa-cart-shopping"></i> Carrito

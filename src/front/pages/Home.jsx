@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import { Link } from "react-router-dom"; // Importamos Link para poder navegar al detalle
+import { Link } from "react-router-dom";
 
 export const Home = () => {
     const { store, dispatch } = useGlobalReducer();
@@ -9,12 +9,9 @@ export const Home = () => {
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-            // Validación de seguridad para la URL
+
             if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file");
 
-            // 1. PETICIÓN A LA API
-            // Asegúrate de que en tu backend (Flask) tengas un endpoint '/api/products'
-            // que devuelva una lista de diccionarios (JSON).
             const response = await fetch(backendUrl + "/api/products");
             
             if (!response.ok) {
@@ -23,8 +20,6 @@ export const Home = () => {
 
             const data = await response.json();
 
-            // 2. DISPATCH (GUARDAR EN EL STORE)
-            // Aquí usamos la acción 'load_products' que creamos en el paso anterior.
             dispatch({ type: "load_products", payload: data });
 
         } catch (error) {
@@ -33,65 +28,88 @@ export const Home = () => {
     }
 
     useEffect(() => {
-        // Ejecutamos la función apenas carga el componente
-        loadProducts();
-    }, []);
+    loadProducts()
+  }, [])
 
-    return (
-        <div className="container mt-5">
-            <h1 className="text-center mb-5">Nuestra Colección</h1>
-            
-            <div className="row">
-                {/* 3. RENDERIZADO DINÁMICO */}
-                {/* Verificamos si hay productos en el store antes de intentar mapear */}
-                {store.products && store.products.length > 0 ? (
-                    store.products.map((product) => (
-                        <div key={product.id} className="col-md-4 col-sm-6 mb-4">
-                            <div className="card h-100 shadow-sm">
-                                {/* Usamos un placeholder si el producto no tiene imagen aún */}
-                                <img 
-                                    src={product.image || "https://via.placeholder.com/300"} 
-                                    className="card-img-top" 
-                                    alt={product.name} 
-                                    style={{ objectFit: "cover", height: "200px" }}
-                                />
-                                <div className="card-body d-flex flex-column">
-                                    <h5 className="card-title">{product.name}</h5>
-                                    <p className="card-text text-muted">
-                                        {/* Ajusta estas propiedades según cómo se llamen en tu base de datos */}
-                                        {product.description ? product.description.substring(0, 50) + "..." : "Sin descripción"}
-                                    </p>
-                                    <h4 className="text-primary mt-auto">${product.price}</h4>
-                                    
-                                    <div className="mt-3 d-flex justify-content-between">
-                                        {/* Botón para ver detalle */}
-                                        <Link to={"/single/" + product.id} className="btn btn-outline-primary">
-                                            Ver más
-                                        </Link>
-                                        
-                                        {/* Botón para agregar al carrito (Lo activaremos pronto) */}
-                                        <button 
-                                            className="btn btn-success"
-                                            onClick={() => dispatch({ type: "add_to_cart", payload: product })}
-                                        >
-                                            <i className="fa-solid fa-cart-shopping"></i> Añadir
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    // Mensaje de carga o error si no hay productos
-                    <div className="col-12 text-center">
-                        <div className="alert alert-warning" role="alert">
-                            No hay productos disponibles o el backend no está conectado.
-                            <br/>
-                            <small>(Asegúrate de que tu Flask esté corriendo en el puerto 3001 y tenga la ruta /api/products)</small>
-                        </div>
-                    </div>
-                )}
-            </div>
+  return (
+    <div className="container mt-5">
+      <div className="row mb-5">
+        <div className="col text-center">
+          <h1 className="display-4">Nombre del sitio</h1>
+          <p className="lead">Urban shoes for everyone</p>
+          <button className="btn btn-dark btn-lg">Shop now</button>
         </div>
-    );
+      </div>
+
+     <div className="row g-4 mb-5">
+        <div className="col-6 col-md-3">
+          <div className="card p-4 text-center">Image</div>
+        </div>
+        <div className="col-6 col-md-3">
+          <div className="card p-4 text-center">Image</div>
+        </div>
+        <div className="col-6 col-md-3">
+          <div className="card p-4 text-center">Image</div>
+        </div>
+        <div className="col-6 col-md-3">
+          <div className="card p-4 text-center">Image</div>
+        </div>
+      </div>
+
+    <div id="carouselExampleCaptions" class="carousel slide">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img 
+  src="https://images.unsplash.com/photo-1565379793984-e65b51b33b37?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  className="d-block mx-auto img-fluid"
+  style={{height: "450px", objectFit: "cover"}}
+  alt="Converse shoes"
+  />
+      <div class="carousel-caption d-none d-md-block">
+        <h5>First slide label</h5>
+        <p>Some representative placeholder content for the first slide.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img 
+  src="https://images.unsplash.com/photo-1670181830393-877c92daa0e3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  className="d-block w-100"
+  style={{height: "fixed", objectFit: "cover"}}
+  alt="Converse shoes"
+  />
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Second slide label</h5>
+        <p>Some representative placeholder content for the second slide.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+         <img 
+  src="https://images.unsplash.com/photo-1670181830277-e6db6b34cc3f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  className="d-block w-100"
+  style={{height: "450px", objectFit: "cover"}}
+  alt="Converse shoes"
+  />
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Third slide label</h5>
+        <p>Some representative placeholder content for the third slide.</p>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+    </div>
+  );
 };
