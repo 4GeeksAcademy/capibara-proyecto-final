@@ -5,6 +5,43 @@ export const Navbar = () => {
     // Conexion del store para leer el carrito
     const { store } = useGlobalReducer();
 
+<<<<<<< HEAD
+	return (
+		<nav className="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+      <div className="container">
+
+        {/* LEFT: Logo */}
+        <Link className="navbar-brand fw-bold" to="/">
+          logo
+        </Link>
+
+        {/* Right side icons */}
+        <div className="d-flex align-items-center gap-3">
+
+          {/* Search (optional) */}
+          <button className="btn btn-outline-secondary btn-sm" type="button">
+            🔍
+          </button>
+
+          {/* Cart */}
+          <button className="btn btn-outline-secondary btn-sm" type="button">
+            🛒
+          </button>
+
+          {/* User */}
+          <button className="btn btn-outline-secondary btn-sm" type="button">
+            👤
+          </button>
+
+          {/* Menu */}
+          <button className="btn btn-outline-secondary btn-sm" type="button">
+            ☰
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+=======
     return (
         <nav className="navbar navbar-light bg-light">
             <div className="container">
@@ -30,4 +67,5 @@ export const Navbar = () => {
             </div>
         </nav>
     );
+>>>>>>> c302c8d14f972280f047ff496315894b680498b4
 };
