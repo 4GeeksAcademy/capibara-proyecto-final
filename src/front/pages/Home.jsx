@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import { Link } from "react-router-dom"; // Importamos Link para poder navegar al detalle
+import { Link } from "react-router-dom";
 
 export const Home = () => {
     const { store, dispatch } = useGlobalReducer();
@@ -9,12 +9,9 @@ export const Home = () => {
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-            // Validación de seguridad para la URL
+
             if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file");
 
-            // 1. PETICIÓN A LA API
-            // Asegúrate de que en tu backend (Flask) tengas un endpoint '/api/products'
-            // que devuelva una lista de diccionarios (JSON).
             const response = await fetch(backendUrl + "/api/products");
             
             if (!response.ok) {
@@ -23,8 +20,6 @@ export const Home = () => {
 
             const data = await response.json();
 
-            // 2. DISPATCH (GUARDAR EN EL STORE)
-            // Aquí usamos la acción 'load_products' que creamos en el paso anterior.
             dispatch({ type: "load_products", payload: data });
 
         } catch (error) {
@@ -46,7 +41,7 @@ export const Home = () => {
         </div>
       </div>
 
-	   <div className="row g-4 mb-5">
+     <div className="row g-4 mb-5">
         <div className="col-6 col-md-3">
           <div className="card p-4 text-center">Image</div>
         </div>
@@ -61,32 +56,11 @@ export const Home = () => {
         </div>
       </div>
 
-    <div
-  id="carouselExampleCaptions"
-  className="carousel slide"
-  data-bs-ride="carousel"
->
-  <div className="carousel-indicators">
-    <button
-      type="button"
-      data-bs-target="#carouselExampleCaptions"
-      data-bs-slide-to="0"
-      className="active"
-      aria-current="true"
-      aria-label="Slide 1"
-    ></button>
-    <button
-      type="button"
-      data-bs-target="#carouselExampleCaptions"
-      data-bs-slide-to="1"
-      aria-label="Slide 2"
-    ></button>
-    <button
-      type="button"
-      data-bs-target="#carouselExampleCaptions"
-      data-bs-slide-to="2"
-      aria-label="Slide 3"
-    ></button>
+    <div id="carouselExampleCaptions" class="carousel slide">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
   </div>
 
   <div className="carousel-inner">

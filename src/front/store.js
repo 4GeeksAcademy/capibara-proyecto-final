@@ -1,10 +1,12 @@
 export const initialStore = () => {
   return {
     message: null,
-    // 1. Array vacío donde cargaremos los zapatos desde tu API/Base de datos
+    // 1. Array vacío para cargar zapatos desde base de datos-api 
     products: [], 
     // 2. Array vacío para ir guardando lo que el usuario quiere comprar
-    cart: []      
+    cart: []
+    
+    // Alternativamente podemos crear un array de service 
   }
 }
 
@@ -16,22 +18,22 @@ export default function storeReducer(store, action = {}) {
         message: action.payload
       };
       
-    // 3. ESTE ES NUEVO: Recibe la lista de zapatos desde la API y actualiza el store
+    // Recibe la lista de zapatos desde la API y actualiza el store
     case 'load_products':
       return {
         ...store,
-        products: action.payload // 'action.payload' será el array de zapatos que traigas del backend
+        products: action.payload // 'action.payload' será el array de zapatos desde el backend
       };
 
-    // 4. ESTE ES NUEVO: Agrega un zapato específico al carrito
+    // Agrega un zapato específico al carrito
     case 'add_to_cart':
       return {
         ...store,
-        // Creamos una copia del carrito actual y le agregamos el nuevo producto
+        // Copia del carrito actual y se le agrega el nuevo producto
         cart: [...store.cart, action.payload]
       };
       
-    // 5. OPCIONAL: Para quitar cosas del carrito (por ahora busca por índice o ID)
+    // Para quitar cosas del carrito (busca por ID)
     case 'remove_from_cart':
         return {
             ...store,
