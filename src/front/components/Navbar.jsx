@@ -6,19 +6,28 @@ export const Navbar = () => {
     const { store } = useGlobalReducer();
 
     return (
-        <nav className="navbar navbar-light bg-light">
+        <nav className="navbar navbar-light bg-light sticky-top">
             <div className="container">
                 <Link to="/" className="text-decoration-none">
                     <span className="navbar-brand mb-0 h1">👟 ShoeStore</span>
                 </Link>
                 
-                <div className="ml-auto d-felx gap2">
-                    {/* Se redirige al usuario a '/demo', que será la página del Carrito */}
-                    <Link to="/demo">
+                {/* Corregido d-felx a d-flex y gap2 a gap-2 */}
+                <div className="ml-auto d-flex align-items-center gap-2">
+                    
+                    {/* NUEVO: Botón directo al Catálogo (visible en desktop) */}
+                    <Link to="/catalog">
+                        <button className="btn btn-outline-dark d-none d-md-block">
+                            Ver Catálogo
+                        </button>
+                    </Link>
+
+                    {/* Actualizado: Ahora apunta a '/cart' en lugar de '/demo' */}
+                    <Link to="/cart">
                         <button className="btn btn-primary position-relative">
                             <i className="fa-solid fa-cart-shopping"></i> Carrito
                             
-                            {/* Este badge muestra el número de items si el carrito tiene algo */}
+                            {/* Badge de cantidad */}
                             {store.cart.length > 0 && (
                                 <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                     {store.cart.length}
@@ -27,7 +36,7 @@ export const Navbar = () => {
                         </button>
                     </Link>
 
-                    {/* Hamburger */}
+                    {/* Hamburger Button */}
                     <button className="btn btn-primary"
                       type="button"
                       data-bs-toggle="offcanvas"
@@ -36,55 +45,61 @@ export const Navbar = () => {
                     <i className="fa-solid fa-bars"></i>
                     </button>
 
+                    {/* Offcanvas Menu */}
                     <div
-                     className="offcanvas offcanvas-end"
-                    tabIndex="-1"
-                    id="mainMenu"
-                    aria-labelledby="mainMenuLabel"
+                      className="offcanvas offcanvas-end"
+                      tabIndex="-1"
+                      id="mainMenu"
+                      aria-labelledby="mainMenuLabel"
                     >
-                  <div className="offcanvas-header">
-                  <h5 className="offcanvas-title" id="mainMenuLabel">Menu</h5>
-                  <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                      <div className="offcanvas-header">
+                      <h5 className="offcanvas-title" id="mainMenuLabel">Menu</h5>
+                      <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                      </div>
+
+                    <div className="offcanvas-body">
+                        <ul className="navbar-nav">
+                            {/* Agregamos Home y Catálogo al menú móvil también */}
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/" data-bs-dismiss="offcanvas"> 
+                                <i className="fa-solid fa-house"></i> Home
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/catalog" data-bs-dismiss="offcanvas"> 
+                                <i className="fa-solid fa-store"></i> Catálogo
+                                </Link>
+                            </li>
+                            
+                            <hr />
+
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/account" data-bs-dismiss="offcanvas"> 
+                                <i className="fa-solid fa-user"></i> My Account
+                                </Link>
+                            </li>
+
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/orders" data-bs-dismiss="offcanvas">
+                                <i className="fa-solid fa-box"></i> Orders
+                                </Link>
+                            </li>
+
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/settings" data-bs-dismiss="offcanvas">
+                                <i className="fa-solid fa-gear"></i> Settings
+                                </Link>
+                            </li>
+                            
+                            <hr/>
+                            <li className="nav-item">
+                                <Link className="nav-link text-danger" to="/logout" data-bs-dismiss="offcanvas">
+                                <i className="fa-solid fa-right-from-bracket"></i> Logout
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
                   </div>
-
-                <div className="offcanvas-body">
-                <ul className="navbar-nav">
-                <li className="nav-item">
-                <Link className="nav-link" to="/account" data-bs-dismiss="offcanvas"> 
-                <i className="fa-solid fa-user"></i> My Account
-                </Link>
-                </li>
-
-                <li className="nav-item">
-                <Link className="nav-link" to="/orders" data-bs-dismiss="offcanvas">
-                <i className="fa-solid fa-box"></i> Orders
-                </Link>
-                </li>
-
-                <li className="nav-item">
-                <Link className="nav-link" to="/settings" data-bs-dismiss="offcanvas">
-                <i className="fa-solid fa-gear"></i> Settings
-                </Link>
-                </li>
-                
-                <hr/>
-                <li className="nav-item">
-                <Link className="nav-link text-danger" to="/logout" data-bs-dismiss="offcanvas">
-                <i className="fa-solid fa-right-from-bracket"></i> Logout
-                </Link>
-                </li>
-                </ul>
-
-
-
-
-        </div>
-      </div>
-
-      
-
-
-                    
                 </div>
             </div>
         </nav>
