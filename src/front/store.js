@@ -5,7 +5,6 @@ export const initialStore = () => {
     products: [], 
     // 2. Array vacío para ir guardando lo que el usuario quiere comprar
     cart: []
-    
     // Alternativamente podemos crear un array de service 
   }
 }
