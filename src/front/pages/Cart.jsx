@@ -22,7 +22,7 @@ export const Cart = () => {
                 </div>
             ) : (
                 <div className="row">
-                    {/* Lista de items (Renderizado directamente aquí para evitar errores de importación) */}
+                    {/* Lista de items  */}
                     <div className="col-md-8">
                         <ul className="list-group mb-3 shadow-sm">
                             {store.cart.map((item, index) => (

@@ -19,11 +19,10 @@ export const Checkout = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Aquí iría la lógica para enviar al backend
+        
         console.log("Orden procesada", formData, store.cart);
         alert("¡Gracias por tu compra! Tu pedido ha sido procesado.");
-        // Opcional: Limpiar carrito después de comprar
-        // dispatch({ type: "clear_cart" }); (requeriría agregar esto al reducer)
+        
     };
 
     return (
