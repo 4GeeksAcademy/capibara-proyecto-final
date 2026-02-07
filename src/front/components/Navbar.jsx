@@ -1,9 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Navbar = () => {
     // Conexion del store para leer el carrito
-    const { store } = useGlobalReducer();
+    const { store, dispatch } = useGlobalReducer();
+
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        dispatch({ type: "logout" });
+        navigate("/login");
+    };
 
     return (
         <nav className="navbar navbar-light bg-light sticky-top">
@@ -101,9 +108,12 @@ export const Navbar = () => {
                             
                             <hr/>
                             <li className="nav-item">
-                                <Link className="nav-link text-danger" to="/logout" data-bs-dismiss="offcanvas">
-                                <i className="fa-solid fa-right-from-bracket"></i> Logout
-                                </Link>
+                                <button
+                                 className="nav-link text-danger btn btn-link"
+                                onClick={handleLogout}
+                            >
+                            <i className="fa-solid fa-right-from-bracket"></i> Logout
+                             </button>
                             </li>
                         </ul>
                     </div>

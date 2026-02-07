@@ -1,4 +1,8 @@
 export const initialStore = () => {
+  // Cargamos el token y el usuario desde localStorage (si existen)
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+
   return {
     message: null,
     // DATOS DE PRUEBA (MOCK DATA)
@@ -34,8 +38,8 @@ export const initialStore = () => {
       }
     ],
     cart: [],
-    user: null,
-    token: null,
+    user: user ? JSON.parse(user) : null,
+    token: token || null,
   };
 };
 
@@ -46,8 +50,16 @@ export default function storeReducer(store, action = {}) {
         ...store,
         user: action.payload.user,
         token: action.payload.token,
-        user: action.payload.user,
       };
+
+      case "logout":
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return {
+          ...store,
+          user: null,
+          token: null,
+        };
 
     case "set_hello":
       return {
@@ -79,6 +91,6 @@ export default function storeReducer(store, action = {}) {
       };
 
     default:
-      throw Error("Unknown action.");
+      return store;
   }
 }
