@@ -46,12 +46,13 @@ export const initialStore = () => {
 export default function storeReducer(store, action = {}) {
   switch (action.type) {
     case "login_success":
+      localStorage.setItem("token", action.payload.token);
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
       return {
         ...store,
         user: action.payload.user,
         token: action.payload.token,
       };
-
       case "logout":
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -60,6 +61,17 @@ export default function storeReducer(store, action = {}) {
           user: null,
           token: null,
         };
+
+        case "update_user": {
+        const updatedUser = { ...(store.user || {}), ...(action.payload || {}) };
+
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        return {
+        ...store,
+        user: updatedUser,
+      };
+    }
 
     case "set_hello":
       return {
