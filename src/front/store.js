@@ -1,66 +1,75 @@
 export const initialStore = () => {
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+  
   return {
-    shoes: [], // Data from GET /shoes
-    token: null, // The JWT access_token from /login
-    currentUser: {}, // User info (email, id)
-    profile: {}, // Data from your Profile model
-    cart: [], // Items added via /cart
+    shoes: [],       // Data from GET /shoes
+    token: token || null,     // JWT access_token from /login or localStorage
+    user: user ? JSON.parse(user) : null,      // User info (email, id, plus profile) from localStorage
+    profile: null,   // Profile data from /profile
+    cart: [],        // Items added via /cart
+    signup: false,   // Track signup status
+    message: "",     // Optional messages
   };
 };
 
 export default function storeReducer(store, action = {}) {
   switch (action.type) {
+
     case "signup_success":
       return {
         ...store,
         signup: true,
       };
+
     case "signup_failed":
       return {
         ...store,
         signup: false,
-      };
-    case "logout":
-      return {
-        ...store,
-        token: null,
-        user: null,
       };
 
     case "login_success":
       return {
         ...store,
         token: action.payload.token,
+        user: action.payload.user,   // Store user info from backend
+        profile: action.payload.user.profile || null, // Optional profile
+      };
+
+    case "logout":
+      return {
+        ...store,
+        token: null,
+        user: null,
+        profile: null,
+        cart: [],
       };
 
     case "update_user":
       return {
         ...store,
-        user: action.payload,
+        user: action.payload.user ? action.payload.user : store.user,
+        profile: action.payload.profile ? action.payload.profile : store.profile,
       };
 
-    case "set_hello":
+    case "set_message":
       return {
         ...store,
         message: action.payload,
       };
 
-    // Recibe la lista de zapatos desde la API y actualiza el store
     case "load_shoes":
       return {
         ...store,
-        shoes: action.payload, // 'action.payload' será el array de zapatos desde el backend
+        shoes: action.payload,
       };
 
-    // Agrega un zapato específico al carrito
     case "add_to_cart":
       return {
         ...store,
-        // Copia del carrito actual y se le agrega el nuevo producto
         cart: [...store.cart, action.payload],
       };
 
-    // Para quitar cosas del carrito (busca por ID)
     case "remove_from_cart":
       return {
         ...store,

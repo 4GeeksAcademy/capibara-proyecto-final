@@ -10,7 +10,6 @@ export const ProductCard = ({ product }) => {
       type: "add_to_cart",
       payload: product,
     });
-    // Opcional: Un alert simple o toast notification
     alert(`${product.name} agregado al carrito!`);
   };
 
@@ -30,7 +29,8 @@ export const ProductCard = ({ product }) => {
         <div className="d-flex justify-content-between align-items-center mt-3">
           <span className="h5 mb-0 text-primary">${product.price}</span>
           <div>
-            <Link to={`/product/${product.id}`} className="btn btn-outline-secondary btn-sm me-2">
+            {/* Updated route to point to /shoe/:id */}
+            <Link to={`/shoe/${product.id}`} className="btn btn-outline-secondary btn-sm me-2">
               Ver más
             </Link>
             <button className="btn btn-dark btn-sm" onClick={addToCart}>

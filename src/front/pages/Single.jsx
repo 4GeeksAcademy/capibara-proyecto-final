@@ -8,7 +8,8 @@ export const Single = () => {
     const [size, setSize] = useState(""); // Estado local para la talla seleccionada
 
     // Buscamos el zapato por ID
-    const product = store.products.find(item => item.id == theId);
+    const product = store.shoes.find(item => item.id == theId);
+
 
     const handleAddToCart = () => {
         if (!size) {
@@ -16,9 +17,9 @@ export const Single = () => {
             return;
         }
         // Enviamos el producto junto con la talla seleccionada
-        dispatch({ 
-            type: "add_to_cart", 
-            payload: { ...product, selectedSize: size } 
+        dispatch({
+            type: "add_to_cart",
+            payload: { ...product, selectedSize: size }
         });
         alert("Producto agregado");
     };
@@ -29,10 +30,10 @@ export const Single = () => {
                 <div className="row">
                     {/* Columna Izquierda: Imagen */}
                     <div className="col-md-6 mb-4">
-                        <img 
+                        <img
                             src={product.image_url}  // <--- CORREGIDO: image_url
-                            className="img-fluid rounded shadow" 
-                            alt={product.name} 
+                            className="img-fluid rounded shadow"
+                            alt={product.name}
                             style={{ width: "100%", maxHeight: "500px", objectFit: "cover" }}
                         />
                     </div>
@@ -41,7 +42,7 @@ export const Single = () => {
                     <div className="col-md-6">
                         <h1 className="display-4 fw-bold">{product.name}</h1>
                         <h3 className="text-primary my-3 display-6">${product.price}</h3>
-                        
+
                         <p className="lead text-muted">
                             {product.description || "Este producto no tiene descripción detallada."}
                         </p>
@@ -49,9 +50,9 @@ export const Single = () => {
                         {/* Selector de Talla */}
                         <div className="mb-4">
                             <label className="form-label fw-bold">Selecciona tu talla:</label>
-                            <select 
-                                className="form-select w-50" 
-                                value={size} 
+                            <select
+                                className="form-select w-50"
+                                value={size}
                                 onChange={(e) => setSize(e.target.value)}
                             >
                                 <option value="">Elegir...</option>
@@ -66,7 +67,7 @@ export const Single = () => {
                         <hr className="my-4" />
 
                         <div className="d-flex gap-3">
-                            <button 
+                            <button
                                 className="btn btn-dark btn-lg flex-grow-1"
                                 onClick={handleAddToCart}
                             >

@@ -5,25 +5,22 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 db = SQLAlchemy()
 
-
 class User(db.Model):
     __tablename__ = "user"
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(
-        String(120), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    profile: Mapped[Optional["Profile"]] = relationship(
-        back_populates="user", uselist=False)
-    cart_items: Mapped[List["Cart"]] = relationship(back_populates="user")
+    profile: Mapped[Optional["Profile"]] = relationship(back_populates="user", uselist=False)
+    cart: Mapped[Optional["Cart"]] = relationship(back_populates="user", uselist=False)
 
     def serialize(self):
         return {
             "id": self.id,
-            "email": self.email
+            "email": self.email,
+            "is_active": self.is_active
         }
-
 
 class Shoe(db.Model):
     __tablename__ = "shoe"
@@ -42,7 +39,6 @@ class Shoe(db.Model):
             "img_url": self.img_url
         }
 
-
 class Profile(db.Model):
     __tablename__ = "profile"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -50,6 +46,7 @@ class Profile(db.Model):
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
     phone_number: Mapped[Optional[str]] = mapped_column(String(20))
     address: Mapped[Optional[str]] = mapped_column(String(500))
+    
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
     user: Mapped["User"] = relationship(back_populates="profile")
 
@@ -59,18 +56,16 @@ class Profile(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "phone_number": self.phone_number,
-            "address": self.address,
-            "user_id": self.user_id
+            "address": self.address
         }
-
 
 class Cart(db.Model):
     __tablename__ = "cart"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
-    user: Mapped["User"] = relationship(back_populates="cart_items")
-    items: Mapped[List["CartItem"]] = relationship(
-        back_populates="cart", cascade="all, delete-orphan")
+    
+    user: Mapped["User"] = relationship(back_populates="cart")
+    items: Mapped[List["CartItem"]] = relationship(back_populates="cart", cascade="all, delete-orphan")
 
     def serialize(self):
         return {
@@ -78,7 +73,6 @@ class Cart(db.Model):
             "user_id": self.user_id,
             "items": [item.serialize() for item in self.items]
         }
-
 
 class CartItem(db.Model):
     __tablename__ = "cart_item"
@@ -95,27 +89,8 @@ class CartItem(db.Model):
         return {
             "id": self.id,
             "quantity": self.quantity,
-            "cart_id": self.cart_id,
-            "shoe_id": self.shoe_id
+            "shoe": self.shoe.serialize()
         }
-
-
-class UserInfo(db.Model):
-    __tablename__ = "user_info"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    full_name: Mapped[str] = mapped_column(String(120), nullable=False)
-    email: Mapped[str] = mapped_column(
-        String(120), unique=True, nullable=False)
-    address: Mapped[Optional[str]] = mapped_column(String(500))
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "full_name": self.full_name,
-            "email": self.email,
-            "address": self.address
-        }
-
 # # --- STOCK MODEL (SIZES) ---
 # class Stock(db.Model):
 #     __tablename__ = "stock"

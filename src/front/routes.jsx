@@ -12,6 +12,10 @@ import { Catalog } from "./pages/Catalog";
 import { Cart } from "./pages/Cart";       
 import { Checkout } from "./pages/Checkout";
 import {Profile} from "./pages/Profile";
+import { Shoes } from "./pages/Shoes"; 
+import { Shoe } from "./pages/Shoe"; 
+import { Signup } from "./pages/Signup";
+import { EditProfile } from "./pages/EditProfile";
 export const router = createBrowserRouter(
     createRoutesFromElements(
         // Root Route: All navigation will start from here.
@@ -31,8 +35,13 @@ export const router = createBrowserRouter(
             <Route path="/product/:theId" element={<Single />} /> 
             
             <Route path="/login" element={<Login />} />
+            
 
             <Route path="/profile" element={<Profile />} />
+            <Route path="/shoes" element={<Shoes />} />
+            <Route path="/shoe/:theId" element={<Shoe />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/editprofile" element={<EditProfile />} />
         </Route>
     )
 );
