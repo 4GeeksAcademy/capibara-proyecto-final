@@ -3,7 +3,7 @@ export const initialStore = () => {
   const user = localStorage.getItem("user");
   
   return {
-    shoes: [],       // Data from GET /shoes
+    products: [],       // Data from GET /shoes
     token: token || null,     // JWT access_token from /login or localStorage
     user: user ? JSON.parse(user) : null,      // User info (email, id, plus profile) from localStorage
     profile: null,   // Profile data from /profile
@@ -29,8 +29,11 @@ export default function storeReducer(store, action = {}) {
       };
 
     case "login_success":
+      localStorage.setItem("token", action.payload.token);
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
       return {
         ...store,
+        user: action.payload.user,
         token: action.payload.token,
         user: action.payload.user,   // Store user info from backend
         profile: action.payload.user.profile || null, // Optional profile
@@ -44,13 +47,25 @@ export default function storeReducer(store, action = {}) {
         profile: null,
         cart: [],
       };
+      case "logout":
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return {
+          ...store,
+          user: null,
+          token: null,
+        };
 
-    case "update_user":
-      return {
+        case "update_user": {
+        const updatedUser = { ...(store.user || {}), ...(action.payload || {}) };
+
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        return {
         ...store,
-        user: action.payload.user ? action.payload.user : store.user,
-        profile: action.payload.profile ? action.payload.profile : store.profile,
+        user: updatedUser,
       };
+    }
 
     case "set_message":
       return {
@@ -58,10 +73,10 @@ export default function storeReducer(store, action = {}) {
         message: action.payload,
       };
 
-    case "load_shoes":
+    case "load_products":
       return {
         ...store,
-        shoes: action.payload,
+        products: action.payload,
       };
 
     case "add_to_cart":
@@ -73,10 +88,14 @@ export default function storeReducer(store, action = {}) {
     case "remove_from_cart":
       return {
         ...store,
+        // Filtramos para quitar el producto que coincida con el ID
+        // Nota: Si hay productos repetidos, esto podría borrar ambos. 
+        // Para un proyecto real avanzado, usaríamos un ID único de carrito, 
+        // pero para este nivel está bien así.
         cart: store.cart.filter((item) => item.id !== action.payload.id),
       };
 
     default:
-      throw Error("Unknown action.");
+      return store;
   }
 }

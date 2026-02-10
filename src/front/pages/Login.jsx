@@ -12,6 +12,11 @@ export const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    if (!email  || !password) {
+      alert("Please enter email and password.");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/login`,
@@ -23,10 +28,11 @@ export const Login = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        alert(data.msg || "Login failed. Please check your credentials.");
+        return;
       }
 
-      const data = await response.json();
+      
 
       // ✅ Save token & user to localStorage (persists after refresh)
       localStorage.setItem("token", data.access_token);
@@ -43,11 +49,11 @@ export const Login = () => {
 
 
       // ✅ Redirect to home after successful login
-      navigate("/");
+      navigate("/profile");
 
     } catch (error) {
       console.error("Login error:", error);
-      alert("Login failed. Please check your credentials.");
+      alert("Login failed (network/server error).");
     }
   };
 
