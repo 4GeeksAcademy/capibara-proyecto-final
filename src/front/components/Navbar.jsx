@@ -2,15 +2,20 @@ import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Navbar = () => {
-    // Conexion del store para leer el carrito
-    const { store, dispatch } = useGlobalReducer();
+  // Conexion del store para leer el carrito
+  const { store, dispatch } = useGlobalReducer();
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  //   const handleLogout = () => {
-  //       dispatch({ type: "logout" });
-  //       navigate("/login");
-  //   };
+  const handleLogout = () => {
+    dispatch({ type: "logout" });
+    navigate("/login");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    // Use handleNavigate after logout to ensure menu closes
+    handleNavigate("/login");
+  };
+
 
   // const handleLogout = () => {
   //   dispatch({ type: "logout" });
@@ -18,7 +23,7 @@ export const Navbar = () => {
   //   localStorage.removeItem("user");
   //   // Use handleNavigate after logout to ensure menu closes
   //   handleNavigate("/");
-  // };
+  //};
 
   const handleNavigate = (path) => {
     // Safely close the offcanvas menu if it is open
@@ -122,7 +127,7 @@ export const Navbar = () => {
                     <i className="fa-solid fa-store"></i> Catálogo
                   </span>
                 </li>
-                
+
                 {/* Added mobile/offcanvas link to About page */}
                 <li className="nav-item">
                   <span

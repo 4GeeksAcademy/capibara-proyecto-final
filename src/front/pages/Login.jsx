@@ -12,14 +12,14 @@ export const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!email  || !password) {
+    if (!email || !password) {
       alert("Please enter email and password.");
       return;
     }
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/login`,
+        `${import.meta.env.VITE_BACKEND_URL}api/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -27,25 +27,21 @@ export const Login = () => {
         }
       );
 
-      if (!response.ok) {
-        alert(data.msg || "Login failed. Please check your credentials.");
-        return;
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Login successful:", data);
+
+        // ✅ Update global store
+        dispatch({
+          type: "login_success",
+          payload: {
+            token: data.access_token,
+            user: data.user,
+          },
+        });
+
       }
 
-      
-
-      // ✅ Save token & user to localStorage (persists after refresh)
-      localStorage.setItem("token", data.access_token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // ✅ Update global store
-      dispatch({
-        type: "login_success",
-        payload: {
-          token: data.access_token,
-          user: data.user,
-        },
-      });
 
 
       // ✅ Redirect to home after successful login

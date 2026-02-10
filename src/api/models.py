@@ -1,3 +1,4 @@
+import string
 from typing import List, Optional
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, Float, ForeignKey, Integer
@@ -44,8 +45,8 @@ class Profile(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     first_name: Mapped[str] = mapped_column(String(120), nullable=False)
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
-    phone_number: Mapped[Optional[str]] = mapped_column(String(20))
-    address: Mapped[Optional[str]] = mapped_column(String(500))
+    phone_number: Mapped[str] = mapped_column(String(20), nullable=False)
+    address: Mapped[str] = mapped_column(String(500))
     
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
     user: Mapped["User"] = relationship(back_populates="profile")
