@@ -4,6 +4,7 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 export const Navbar = () => {
   // Conexion del store para leer el carrito
   const { store, dispatch } = useGlobalReducer();
+  const isLoggedIn = !!store.user; // checa si hay un usuario logueado
 
   const navigate = useNavigate();
 
@@ -184,6 +185,7 @@ export const Navbar = () => {
                     </li>
                   </>
                 ) : (
+                  <>
                   <li className="nav-item">
                     <button
                       className="nav-link btn btn-link"
@@ -192,6 +194,16 @@ export const Navbar = () => {
                       <i className="fa-solid fa-right-to-bracket"></i> Login
                     </button>
                   </li>
+
+                  <li className="nav-item">
+                    <button
+                      className="nav-link btn btn-link"
+                      onClick={() => handleNavigate("/signup")}
+                    >
+                      <i className="fa-solid fa-user-plus"></i> Signup
+                    </button>
+                  </li>
+                  </>
                 )}
               </ul>
             </div>
