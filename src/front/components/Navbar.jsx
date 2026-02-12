@@ -148,7 +148,7 @@ export const Navbar = () => {
                       <span
                         className="nav-link"
                         style={{ cursor: "pointer" }}
-                        onClick={() => handleNavigate("/editprofile")}
+                        onClick={() => handleNavigate("/profile")}
                       >
                         <i className="fa-solid fa-user"></i> My Account
                       </span>
