@@ -45,7 +45,7 @@ export const Login = () => {
 
 
       // ✅ Redirect to home after successful login
-      navigate("/profile");
+      navigate("/");
 
     } catch (error) {
       console.error("Login error:", error);

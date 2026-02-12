@@ -9,6 +9,8 @@ api = Blueprint('api', __name__)
 CORS(api)
 
 # --- AUTH ---
+
+
 @api.route('/signup', methods=['POST'])
 def signup():
     body = request.get_json()
@@ -17,10 +19,12 @@ def signup():
     if User.query.filter_by(email=body["email"]).first():
         return jsonify({"msg": "Email already exists"}), 409
 
-    user = User(email=body["email"], password=generate_password_hash(body["password"]))
+    user = User(email=body["email"],
+                password=generate_password_hash(body["password"]))
     db.session.add(user)
     db.session.commit()
     return jsonify({"msg": "Welcome to the Shoe Store!"}), 201
+
 
 @api.route('/login', methods=['POST'])
 def login():
@@ -33,18 +37,23 @@ def login():
     return jsonify({"access_token": access_token, "user": user.serialize()}), 200
 
 # --- SHOES ---
+
+
 @api.route('/shoes', methods=['GET'])
 def get_shoes():
     shoes = Shoe.query.all()
     return jsonify([s.serialize() for s in shoes]), 200
 
+
 @api.route('/shoe', methods=['POST'])
 def add_shoe():
     body = request.get_json()
-    new_shoe = Shoe(brand=body["brand"], model_name=body["name"], price=body["price"], img_url=body.get("img_url"))
+    new_shoe = Shoe(brand=body["brand"], model_name=body["name"],
+                    price=body["price"], img_url=body.get("img_url"))
     db.session.add(new_shoe)
     db.session.commit()
     return jsonify({"msg": "Shoe added!", "shoe_id": new_shoe.id}), 201
+
 
 @api.route('/shoes', methods=['DELETE'])
 def delete_shoe():
@@ -56,6 +65,7 @@ def delete_shoe():
     db.session.delete(shoe)
     db.session.commit()
     return jsonify({"msg": "Shoe deleted successfully!"}), 200
+
 
 @api.route('/shoes', methods=['PUT'])
 def update_shoe():
@@ -73,12 +83,14 @@ def update_shoe():
     return jsonify({"msg": "Shoe updated successfully!", "shoe": shoe.serialize()}), 200
 
 # --- CART ---
+
+
 @api.route('/cart', methods=['POST'])
 @jwt_required()
-def add_to_cart():  
+def add_to_cart():
     user_id = get_jwt_identity()
     body = request.get_json()
-    
+
     # Get or Create Cart for User
     cart = Cart.query.filter_by(user_id=user_id).first()
     if not cart:
@@ -87,15 +99,18 @@ def add_to_cart():
         db.session.flush()
 
     # Check if item already in cart
-    item = CartItem.query.filter_by(cart_id=cart.id, shoe_id=body["shoe_id"]).first()
+    item = CartItem.query.filter_by(
+        cart_id=cart.id, shoe_id=body["shoe_id"]).first()
     if item:
         item.quantity += body.get("quantity", 1)
     else:
-        item = CartItem(cart_id=cart.id, shoe_id=body["shoe_id"], quantity=body.get("quantity", 1))
+        item = CartItem(
+            cart_id=cart.id, shoe_id=body["shoe_id"], quantity=body.get("quantity", 1))
         db.session.add(item)
 
     db.session.commit()
     return jsonify({"msg": "Added to cart"}), 200
+
 
 @api.route('/cart', methods=['GET'])
 @jwt_required()
@@ -106,17 +121,19 @@ def get_cart():
         return jsonify({"items": []}), 200
     return jsonify(cart.serialize()), 200
 
+
 @api.route('/cart', methods=['PUT'])
 @jwt_required()
 def update_cart():
     user_id = get_jwt_identity()
     body = request.get_json()
-    
+
     cart = Cart.query.filter_by(user_id=user_id).first()
     if not cart:
         return jsonify({"msg": "Cart not found"}), 404
 
-    cart_item = CartItem.query.filter_by(id=body["cart_item_id"], cart_id=cart.id).first()
+    cart_item = CartItem.query.filter_by(
+        id=body["cart_item_id"], cart_id=cart.id).first()
     if not cart_item:
         return jsonify({"msg": "Cart item not found"}), 404
 
@@ -124,17 +141,19 @@ def update_cart():
     db.session.commit()
     return jsonify({"msg": "Cart updated!", "cart_item": cart_item.serialize()}), 200
 
+
 @api.route('/cart', methods=['DELETE'])
 @jwt_required()
 def remove_from_cart():
     user_id = get_jwt_identity()
     body = request.get_json()
-    
+
     cart = Cart.query.filter_by(user_id=user_id).first()
     if not cart:
         return jsonify({"msg": "Cart not found"}), 404
 
-    cart_item = CartItem.query.filter_by(id=body["cart_item_id"], cart_id=cart.id).first()
+    cart_item = CartItem.query.filter_by(
+        id=body["cart_item_id"], cart_id=cart.id).first()
     if not cart_item:
         return jsonify({"msg": "Cart item not found"}), 404
 
@@ -143,11 +162,17 @@ def remove_from_cart():
     return jsonify({"msg": "Item removed from cart!"}), 200
 
 # --- PROFILE ---
+
+
 @api.route('/profile', methods=['POST'])
 @jwt_required()
 def add_profile():
     body = request.get_json()
     user_id = get_jwt_identity()
+
+    existing_profile = Profile.query.filter_by(user_id=user_id).first()
+    if existing_profile:
+        return jsonify({"msg": "User already has a profile"}), 409
 
     new_profile = Profile(
         first_name=body["first_name"],
@@ -155,11 +180,16 @@ def add_profile():
         phone_number=body.get("phone_number"),
         address=body.get("address"),
         user_id=user_id
-        
     )
+
     db.session.add(new_profile)
     db.session.commit()
-    return jsonify({"msg": "Profile created successfully!", "profile_id": new_profile.id}), 201
+
+    return jsonify({
+        "msg": "Profile created successfully!",
+        "profile": new_profile.serialize()
+    }), 201
+
 
 @api.route('/profile', methods=['GET'])
 @jwt_required()
@@ -169,6 +199,7 @@ def get_profile():
     if not profile:
         return jsonify({"msg": "Profile not found"}), 404
     return jsonify(profile.serialize()), 200
+
 
 @api.route('/profile', methods=['PUT'])
 @jwt_required()

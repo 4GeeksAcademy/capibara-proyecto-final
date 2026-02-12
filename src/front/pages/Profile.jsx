@@ -1,152 +1,131 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Profile = () => {
   const { store, dispatch } = useGlobalReducer();
-  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [msg, setMsg] = useState("");
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     phone_number: "",
     address: "",
   });
-  const [msg, setMsg] = useState("");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch existing profile data when component loads
-    const fetchProfile = async () => {
-      try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-        const res = await fetch(`${backendUrl}/api/profile`, {
-          headers: {
-            "Authorization": `Bearer ${store.token}`
-          }
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setFormData({
-            first_name: data.first_name || "",
-            last_name: data.last_name || "",
-            phone_number: data.phone_number || "",
-            address: data.address || "",
-          });
-          dispatch({ type: "update_user", payload: { profile: data } });
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (store.token) {
-      fetchProfile();
-    } else {
-      navigate("/login");
+    if (!store.user) {
+      setLoading(false);
+      return;
     }
-  }, [store.token]);
+
+    // If user already has a profile, redirect or show message
+    if (store.user.profile) {
+      setMsg("✅ You already have a profile.");
+    }
+
+    setLoading(false);
+  }, [store.user]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMsg("");
 
+    const token = store.token || localStorage.getItem("token");
+    if (!token) {
+      setMsg("⚠️ You must be logged in to create a profile");
+      return;
+    }
+
+    setSubmitting(true);
+
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-      const res = await fetch(`${backendUrl}/api/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${store.token}`
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}api/profile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.msg || "Error updating profile");
+        setMsg(`⚠️ ${data.msg || "Error creating profile"}`);
+        return;
       }
 
-      // Update global state
-      dispatch({ type: "update_user", payload: { profile: data } });
-      setMsg("✅ Profile updated successfully!");
+      // Update global store with new profile
+      dispatch({
+        type: "update_user",
+        payload: { profile: data.profile },
+      });
 
-    } catch (error) {
-      setMsg(`⚠️ ${error.message}`);
-      console.error("Update error:", error);
+      setMsg("✅ Profile created successfully!");
+    } catch (err) {
+      console.error(err);
+      setMsg("⚠️ Something went wrong");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <div className="container mt-5">Loading...</div>;
+    return <p className="text-center mt-5">Loading...</p>;
   }
+
+  if (!store.user) {
+    return (
+      <div className="container mt-5 text-center">
+        <h2>You are not logged in</h2>
+        <p>Please log in to create your profile</p>
+        <Link to="/login" className="btn btn-primary">
+          Go to Login
+        </Link>
+      </div>
+    );
+  }
+  console.log("Fetching:", `${import.meta.env.VITE_BACKEND_URL}api/profile`);
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Edit Profile</h1>
-      {msg && <div className={`alert ${msg.includes("✅") ? "alert-success" : "alert-warning"}`}>{msg}</div>}
+      {msg && <div className="alert alert-info">{msg}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">First Name</label>
-          <input
-            type="text"
-            className="form-control"
-            name="first_name"
-            value={formData.first_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <h2>Create Your Profile</h2>
 
-        <div className="mb-3">
-          <label className="form-label">Last Name</label>
-          <input
-            type="text"
-            className="form-control"
-            name="last_name"
-            value={formData.last_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="mt-3">
+        {["first_name", "last_name", "phone_number", "address"].map((field) => (
+          <div className="mb-3" key={field}>
+            <label className="form-label">
+              {field.replace("_", " ").toUpperCase()}
+            </label>
+            <input
+              type="text"
+              name={field}
+              className="form-control"
+              value={formData[field]}
+              onChange={handleChange}
+              required={field.includes("name")}
+            />
+          </div>
+        ))}
 
-        <div className="mb-3">
-          <label className="form-label">Phone Number</label>
-          <input
-            type="tel"
-            className="form-control"
-            name="phone_number"
-            value={formData.phone_number}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Address</label>
-          <textarea
-            className="form-control"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            rows="3"
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary">Update Profile</button>
-        <button
-          type="button"
-          className="btn btn-secondary ms-2"
-          onClick={() => navigate("/profile")}
-        >
-          Cancel
+        <button className="btn btn-primary" disabled={submitting}>
+          {submitting ? "Creating..." : "Create Profile"}
         </button>
       </form>
     </div>
