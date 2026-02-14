@@ -73,7 +73,7 @@ export default function storeReducer(store, action = {}) {
     case "load_products":
       return {
         ...store,
-        products: action.payload,
+        shoes: action.payload,
       };
 
     case "add_to_cart":
