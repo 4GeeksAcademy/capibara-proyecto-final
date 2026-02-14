@@ -145,11 +145,12 @@ export const Navbar = () => {
                 {/* Conditional links */}
                 {store.user ? (
                   <>
+
                     <li className="nav-item">
                       <span
                         className="nav-link"
                         style={{ cursor: "pointer" }}
-                        onClick={() => handleNavigate("/profile")}
+                        onClick={() => handleNavigate("/editprofile")}
                       >
                         <i className="fa-solid fa-user"></i> My Account
                       </span>

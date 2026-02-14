@@ -18,7 +18,7 @@ export const Catalog = () => {
             console.error("Error loading products:", error);
         }
     };
-
+    console.log("Loaded shoes:", store.shoes);
     useEffect(() => {
         if (!store.shoes || store.shoes.length === 0) loadShoes();
     }, []);

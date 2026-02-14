@@ -90,6 +90,29 @@ export default function storeReducer(store, action = {}) {
         ),
       };
 
+      case "admin_add_product":
+        return {
+          ...store,
+          products: [...store.products, action.payload],
+        };
+      
+      case "admin_delete_product": {
+        const idToDelete = action.payload.id;
+        return {
+          ...store,
+          products: store.products.filter((p)  => p.id !== idToDelete),
+        };
+      }
+
+      case "admin_update_product": {
+        const updatedProduct = action.payload;
+        return {
+          ...store,
+          products: store.products.map((p) => p.id === updatedProduct.id ? updatedProduct : p),
+        }
+      };
+      
+
     default:
       return store;
   }

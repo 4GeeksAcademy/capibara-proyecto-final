@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { useNavigate } from "react-router-dom";
 
 export const Profile = () => {
   const { store, dispatch } = useGlobalReducer();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -76,6 +78,7 @@ export const Profile = () => {
       });
 
       setMsg("✅ Profile created successfully!");
+      navigate("/editprofile");
     } catch (err) {
       console.error(err);
       setMsg("⚠️ Something went wrong");

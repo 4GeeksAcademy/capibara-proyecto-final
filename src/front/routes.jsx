@@ -16,6 +16,7 @@ import { Shoes } from "./pages/Shoes";
 import { Shoe } from "./pages/Shoe"; 
 import { Signup } from "./pages/Signup";
 import { EditProfile } from "./pages/EditProfile";
+import { Admin } from "./pages/Admin";
 export const router = createBrowserRouter(
     createRoutesFromElements(
         // Root Route: All navigation will start from here.
@@ -42,6 +43,7 @@ export const router = createBrowserRouter(
             <Route path="/shoe/:theId" element={<Shoe />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/editprofile" element={<EditProfile />} />
+            <Route path="/admin" element={<Admin />} />
         </Route>
     )
 );
