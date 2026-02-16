@@ -10,39 +10,49 @@ export const Catalog = () => {
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL;
             if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined");
+            
             const response = await fetch(backendUrl + "/api/shoes");
             if (!response.ok) throw new Error("Error loading shoes");
+            
             const data = await response.json();
-            dispatch({ type: "load_shoes", payload: data });
+            // ✅ Usamos "products" para coincidir con el reducer optimizado
+            dispatch({ type: "load_products", payload: data }); 
         } catch (error) {
             console.error("Error loading products:", error);
         }
     };
-    console.log("Loaded shoes:", store.shoes);
+    
     useEffect(() => {
-        if (!store.shoes || store.shoes.length === 0) loadShoes();
+        // ✅ Validamos store.products en lugar de store.shoes
+        if (!store.products || store.products.length === 0) {
+            loadShoes();
+        }
     }, []);
 
     return (
         <div className="container mt-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1 className="display-5">Our Shoes</h1>
-                <Link to="/" className="btn btn-outline-secondary">Back Home</Link>
+                <h1 className="fw-bold">Nuestra Colección</h1>
+                <Link to="/" className="btn btn-sm btn-outline-secondary">
+                    <i className="fa-solid fa-house me-2"></i>Inicio
+                </Link>
             </div>
 
-            {store.shoes && store.shoes.length > 0 ? (
+            {/* ✅ Mapeamos sobre store.products */}
+            {store.products && store.products.length > 0 ? (
                 <div className="row g-4">
-                    {store.shoes.map((shoe) => (
+                    {store.products.map((shoe) => (
                         <div key={shoe.id} className="col-12 col-md-6 col-lg-3">
                             <ProductCard product={shoe} />
                         </div>
                     ))}
                 </div>
             ) : (
-                <div className="text-center mt-5">
+                <div className="text-center py-5">
                     <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                        <span className="visually-hidden">Cargando...</span>
                     </div>
+                    <p className="mt-2 text-muted">Buscando los mejores zapatos para ti...</p>
                 </div>
             )}
         </div>

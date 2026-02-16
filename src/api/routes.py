@@ -1,3 +1,4 @@
+from functools import wraps
 import os
 from flask import Flask, request, jsonify, Blueprint
 from api.models import db, User, Shoe, Profile, Cart, CartItem
@@ -8,22 +9,115 @@ from werkzeug.security import generate_password_hash, check_password_hash
 api = Blueprint('api', __name__)
 CORS(api)
 
+
+def admin_required(fn):
+    @wraps(fn)
+    @jwt_required()
+    def wrapper(*args, **kwargs):
+        user_id = get_jwt_identity()
+        user = User.query.get(int(user_id))
+        if not user or not user.is_admin:
+            return jsonify({"msg": "Admin access required"}), 403
+        return fn(*args, **kwargs)
+    return wrapper
+
+
+
+@api.route('/admin/login', methods=['POST'])
+def admin_login():
+    body = request.get_json()
+    user = User.query.filter_by(email=body.get("email")).first()
+
+    if not user or not check_password_hash(user.password, body.get("password")):
+        return jsonify({"msg": "Invalid credentials"}), 401
+
+    if not user.is_admin:
+        return jsonify({"msg": "Admin access required"}), 403
+
+    access_token = create_access_token(identity=str(user.id))
+    return jsonify({
+        "access_token": access_token,
+        "user": user.serialize(),
+        "msg": "Admin login successful"
+    }), 200
+
+
+@api.route('/admin/create', methods=['POST'])
+def create_admin():
+    body = request.get_json()
+
+    if body.get("secret_key") != os.getenv("ADMIN_CREATION_SECRET"):
+        return jsonify({"msg": "Unauthorized"}), 401
+
+    if not body.get("email") or not body.get("password"):
+        return jsonify({"msg": "Missing email or password"}), 400
+
+    if User.query.filter_by(email=body["email"]).first():
+        return jsonify({"msg": "Email already exists"}), 409
+
+    admin_user = User(
+        email=body["email"],
+        password=generate_password_hash(body["password"]),
+        is_admin=True
+    )
+    db.session.add(admin_user)
+    db.session.commit()
+
+    return jsonify({
+        "msg": "Admin user created successfully!",
+        "user": admin_user.serialize()
+    }), 201
+
 # --- AUTH ---
 
 
 @api.route('/signup', methods=['POST'])
 def signup():
-    body = request.get_json()
-    if not body.get("email") or not body.get("password"):
-        return jsonify({"msg": "Missing email or password"}), 400
-    if User.query.filter_by(email=body["email"]).first():
-        return jsonify({"msg": "Email already exists"}), 409
+    try:
+        body = request.get_json()
 
-    user = User(email=body["email"],
-                password=generate_password_hash(body["password"]))
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({"msg": "Welcome to the Shoe Store!"}), 201
+        # Validate required fields
+        if not body.get("email") or not body.get("password"):
+            return jsonify({"msg": "Missing email or password"}), 400
+
+        # Check if email already exists
+        if User.query.filter_by(email=body["email"]).first():
+            return jsonify({"msg": "Email already exists"}), 409
+
+        # Create user
+        user = User(
+            email=body["email"],
+            password=generate_password_hash(body["password"])
+        )
+        db.session.add(user)
+        db.session.flush()  # Get user.id without committing yet
+
+        # Create profile for the user
+        profile = Profile(
+            user_id=user.id,
+            first_name=body.get("first_name"),
+            last_name=body.get("last_name"),
+            phone_number=body.get("phone_number"),
+            address=body.get("address")
+        )
+        db.session.add(profile)
+
+        # Commit both user and profile together
+        db.session.commit()
+
+        # Generate access token (auto-login)
+        access_token = create_access_token(identity=str(user.id))
+
+        return jsonify({
+            "msg": "Welcome to the Shoe Store!",
+            "access_token": access_token,
+            "user": user.serialize(),
+            "profile": profile.serialize()
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error creating account"}), 500
 
 
 @api.route('/login', methods=['POST'])
@@ -38,7 +132,6 @@ def login():
 
 # --- SHOES ---
 
-
 @api.route('/shoes', methods=['GET'])
 def get_shoes():
     shoes = Shoe.query.all()
@@ -46,6 +139,7 @@ def get_shoes():
 
 
 @api.route('/shoe', methods=['POST'])
+@admin_required  # ✅ ADD THIS LINE
 def add_shoe():
     body = request.get_json()
     new_shoe = Shoe(brand=body["brand"], model_name=body["name"],
@@ -56,6 +150,7 @@ def add_shoe():
 
 
 @api.route('/shoes', methods=['DELETE'])
+@admin_required  # ✅ ADD THIS LINE
 def delete_shoe():
     body = request.get_json()
     shoe_id = body.get("shoe_id")
@@ -68,6 +163,7 @@ def delete_shoe():
 
 
 @api.route('/shoes', methods=['PUT'])
+@admin_required  # ✅ ADD THIS LINE
 def update_shoe():
     body = request.get_json()
     shoe_id = body.get("shoe_id")
@@ -81,7 +177,6 @@ def update_shoe():
     shoe.img_url = body.get("img_url", shoe.img_url)
     db.session.commit()
     return jsonify({"msg": "Shoe updated successfully!", "shoe": shoe.serialize()}), 200
-
 # --- CART ---
 
 
@@ -160,59 +255,95 @@ def remove_from_cart():
     db.session.delete(cart_item)
     db.session.commit()
     return jsonify({"msg": "Item removed from cart!"}), 200
-
 # --- PROFILE ---
 
 
 @api.route('/profile', methods=['POST'])
 @jwt_required()
 def add_profile():
-    body = request.get_json()
-    user_id = get_jwt_identity()
+    try:
+        body = request.get_json()
+        user_id = int(get_jwt_identity())
 
-    existing_profile = Profile.query.filter_by(user_id=user_id).first()
-    if existing_profile:
-        return jsonify({"msg": "User already has a profile"}), 409
+        existing_profile = Profile.query.filter_by(user_id=user_id).first()
+        if existing_profile:
+            return jsonify({"msg": "User already has a profile"}), 409
 
-    new_profile = Profile(
-        first_name=body["first_name"],
-        last_name=body["last_name"],
-        phone_number=body.get("phone_number"),
-        address=body.get("address"),
-        user_id=user_id
-    )
+        new_profile = Profile(
+            first_name=body.get("first_name"),
+            last_name=body.get("last_name"),
+            phone_number=body.get("phone_number"),
+            address=body.get("address"),
+            user_id=user_id
+        )
 
-    db.session.add(new_profile)
-    db.session.commit()
+        db.session.add(new_profile)
+        db.session.commit()
 
-    return jsonify({
-        "msg": "Profile created successfully!",
-        "profile": new_profile.serialize()
-    }), 201
+        return jsonify({
+            "msg": "Profile created successfully!",
+            "profile": new_profile.serialize()
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error creating profile"}), 500
 
 
 @api.route('/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
-    user_id = get_jwt_identity()
-    profile = Profile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({"msg": "Profile not found"}), 404
-    return jsonify(profile.serialize()), 200
+    try:
+        user_id = int(get_jwt_identity())  # ✅ Convert to int
+        profile = Profile.query.filter_by(user_id=user_id).first()
+        if not profile:
+            return jsonify({"msg": "Profile not found"}), 404
+        return jsonify(profile.serialize()), 200
+    except Exception as e:
+        return jsonify({"msg": "Error fetching profile"}), 500
 
 
 @api.route('/profile', methods=['PUT'])
 @jwt_required()
 def update_profile():
+    try:
+        user_id = int(get_jwt_identity())  # ✅ Convert to int
+        body = request.get_json()
+
+        profile = Profile.query.filter_by(user_id=user_id).first()
+        if not profile:
+            return jsonify({"msg": "Profile not found"}), 404
+
+        # Update fields
+        profile.first_name = body.get("first_name", profile.first_name)
+        profile.last_name = body.get("last_name", profile.last_name)
+        profile.phone_number = body.get("phone_number", profile.phone_number)
+        profile.address = body.get("address", profile.address)
+
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Profile updated successfully!",
+            "profile": profile.serialize()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error updating profile"}), 500
+@api.route('/change-password', methods=['PUT'])
+@jwt_required()
+def change_password():
     user_id = get_jwt_identity()
     body = request.get_json()
-    profile = Profile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({"msg": "Profile not found"}), 404
-
-    profile.first_name = body.get("first_name", profile.first_name)
-    profile.last_name = body.get("last_name", profile.last_name)
-    profile.phone_number = body.get("phone_number", profile.phone_number)
-    profile.address = body.get("address", profile.address)
+    
+    user = User.query.get(int(user_id))
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+    
+    # Verify current password
+    if not check_password_hash(user.password, body.get("current_password")):
+        return jsonify({"msg": "Contraseña actual incorrecta"}), 401
+    
+    # Update to new password
+    user.password = generate_password_hash(body.get("new_password"))
     db.session.commit()
-    return jsonify({"msg": "Profile updated successfully!", "profile": profile.serialize()}), 200
+    
+    return jsonify({"msg": "Contraseña actualizada"}), 200

@@ -1,83 +1,83 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import useGlobalReducer from "../hooks/useGlobalReducer";
-
 export const Cart = () => {
     const { store, dispatch } = useGlobalReducer();
 
-    // Calculamos el total
-    const total = store.cart.reduce((acumulador, item) => acumulador + item.price, 0);
+    // Calculamos el total con 2 decimales para evitar errores de redondeo de JS
+    const total = store.cart.reduce((acumulador, item) => acumulador + item.price, 0).toFixed(2);
 
     return (
-        <div className="container mt-5 mb-5">
-            <h2 className="mb-4">🛒 Tu Carrito de Compras</h2>
+        <div className="container mt-5 mb-5" style={{ minHeight: "70vh" }}>
+            <h2 className="mb-4 fw-bold">🛒 Mi Carrito</h2>
 
             {store.cart.length === 0 ? (
-                <div className="text-center p-5 bg-light rounded shadow-sm">
+                <div className="text-center p-5 bg-light rounded shadow-sm border">
+                    <i className="fa-solid fa-cart-shopping fa-3x mb-3 text-muted"></i>
                     <h3>Tu carrito está vacío</h3>
-                    <p className="text-muted">Parece que aún no has añadido zapatos.</p>
+                    <p className="text-muted">¡Parece que aún no has elegido tus nuevos zapatos favoritos!</p>
                     <Link to="/catalog">
-                        <button className="btn btn-primary mt-3">Ir a comprar</button>
+                        <button className="btn btn-primary btn-lg mt-3 px-5">Explorar Catálogo</button>
                     </Link>
                 </div>
             ) : (
-                <div className="row">
-                    {/* Lista de items  */}
-                    <div className="col-md-8">
-                        <ul className="list-group mb-3 shadow-sm">
-                            {store.cart.map((item, index) => (
-                                <li key={index} className="list-group-item d-flex justify-content-between lh-sm align-items-center">
-                                    <div className="d-flex align-items-center">
-                                        <img 
-                                            src={item.image_url} 
-                                            alt={item.name}
-                                            style={{ width: "80px", height: "80px", objectFit: "cover", marginRight: "15px" }} 
-                                            className="rounded"
-                                        />
-                                        <div>
-                                            <h6 className="my-0">{item.name}</h6>
-                                            <small className="text-muted">Talla: {item.selectedSize || "N/A"}</small>
+                <div className="row g-4">
+                    {/* Lista de items */}
+                    <div className="col-lg-8">
+                        <div className="card border-0 shadow-sm">
+                            <ul className="list-group list-group-flush">
+                                {store.cart.map((item, index) => (
+                                    <li key={index} className="list-group-item p-3">
+                                        <div className="row align-items-center">
+                                            <div className="col-3 col-md-2">
+                                                <img 
+                                                    src={item.image_url} 
+                                                    alt={item.name}
+                                                    className="img-fluid rounded"
+                                                    style={{ objectFit: "cover", aspectRatio: "1/1" }}
+                                                />
+                                            </div>
+                                            <div className="col-5 col-md-6">
+                                                <h6 className="mb-0 fw-bold">{item.name}</h6>
+                                                <small className="text-secondary">Talla seleccionada: {item.selectedSize || "N/A"}</small>
+                                            </div>
+                                            <div className="col-4 col-md-4 text-end">
+                                                <span className="fw-bold d-block mb-1">${item.price.toFixed(2)}</span>
+                                                <button 
+                                                    className="btn btn-sm btn-outline-danger border-0"
+                                                    title="Eliminar del carrito"
+                                                    onClick={() => dispatch({ type: "remove_from_cart", payload: index })} // Usamos index
+                                                >
+                                                    <i className="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="d-flex align-items-center">
-                                        <span className="text-muted me-3 fw-bold">${item.price}</span>
-                                        <button 
-                                            className="btn btn-outline-danger btn-sm"
-                                            onClick={() => dispatch({ type: "remove_from_cart", payload: item })}
-                                        >
-                                            <i className="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
 
                     {/* Resumen de pago */}
-                    <div className="col-md-4">
-                        <div className="card shadow-sm border-0 bg-light">
+                    <div className="col-lg-4">
+                        <div className="card shadow-sm border-0 sticky-top" style={{ top: "20px" }}>
                             <div className="card-body p-4">
-                                <h4 className="mb-3">Resumen</h4>
-                                <div className="d-flex justify-content-between mb-3">
-                                    <span>Subtotal:</span>
+                                <h5 className="mb-4 fw-bold">Resumen del pedido</h5>
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span className="text-muted">Subtotal</span>
                                     <span>${total}</span>
                                 </div>
                                 <div className="d-flex justify-content-between mb-3">
-                                    <span>Envío:</span>
-                                    <span className="text-success">Gratis</span>
+                                    <span className="text-muted">Envío</span>
+                                    <span className="text-success fw-bold">Gratis</span>
                                 </div>
                                 <hr />
                                 <div className="d-flex justify-content-between mb-4">
-                                    <strong>Total:</strong>
-                                    <strong className="text-primary fs-4">${total}</strong>
+                                    <span className="h5 fw-bold">Total</span>
+                                    <span className="h4 fw-bold text-primary">${total}</span>
                                 </div>
-                                <Link to="/checkout">
-                                    <button className="btn btn-success w-100 py-2 fw-bold">
-                                        Proceder al Pago
-                                    </button>
+                                <Link to="/checkout" className="btn btn-dark btn-lg w-100 mb-3">
+                                    Finalizar Compra
                                 </Link>
-                                <Link to="/catalog" className="d-block text-center mt-3 text-decoration-none">
-                                    Seguir comprando
+                                <Link to="/catalog" className="btn btn-link w-100 text-muted text-decoration-none text-center">
+                                    <i className="fa-solid fa-arrow-left me-2"></i>Seguir comprando
                                 </Link>
                             </div>
                         </div>

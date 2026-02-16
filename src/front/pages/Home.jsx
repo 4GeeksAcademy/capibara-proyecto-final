@@ -52,10 +52,10 @@ export const Home = () => {
     };
 
     useEffect(() => {
-        if (store.products && store.products.length === 0) {
+        if (store.shoes && store.shoes.length === 0) {
             loadProducts();
         }
-    }, [store.products]);
+    }, [store.shoes]);
 
     return (
       <>
