@@ -1,3 +1,6 @@
+import useGlobalReducer from "../hooks/useGlobalReducer";
+import { Link } from "react-router-dom";
+
 export const Cart = () => {
     const { store, dispatch } = useGlobalReducer();
 
