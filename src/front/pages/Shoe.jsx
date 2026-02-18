@@ -1,5 +1,5 @@
 // src/front/pages/Shoe.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
@@ -7,6 +7,7 @@ export const Shoe = () => {
     const { store, dispatch } = useGlobalReducer();
     const { theId } = useParams();
     const [selectedSize, setSelectedSize] = useState("");
+    const [shoe, setShoe] = useState("");
 
     // Notification state
     const [msg, setMsg] = useState({ show: false, text: "", type: "" });
@@ -15,12 +16,22 @@ export const Shoe = () => {
         setMsg({ show: true, text, type });
         setTimeout(() => setMsg({ show: false, text: "", type: "" }), 3000);
     };
+    useEffect(() => {
+        fetch(`/api/shoe/${theId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.msg) {
+                    notify("⚠️ Producto no encontrado", "warning");
+                } else {
+                    setShoe(data);
+                }
+            })
+            .catch(() => notify("❌ Error al cargar el producto", "danger"));
+    }, [theId]);
 
-    // Find the shoe by ID
-    const shoe = store.shoes.find((item) => item.id === Number(theId));
 
     // 1️⃣ Loading state
-    if (store.shoes.length === 0) {
+    if (shoe) {
         return (
             <div className="text-center mt-5">
                 <div className="spinner-border text-primary" role="status"></div>

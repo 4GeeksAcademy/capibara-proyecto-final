@@ -1,13 +1,13 @@
 export const initialStore = () => {
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
-  const profile = localStorage.getItem("profile");  // ✅ Add profile
+  const profile = localStorage.getItem("profile"); // ✅ Add profile
   const cart = localStorage.getItem("cart");
   return {
     products: [],
     token: token || null,
     user: user ? JSON.parse(user) : null,
-    profile: profile ? JSON.parse(profile) : null,  // ✅ Add profile to state
+    profile: profile ? JSON.parse(profile) : null, // ✅ Add profile to state
     cart: cart ? JSON.parse(cart) : [],
     signup: false,
     message: "",
@@ -29,12 +29,13 @@ export default function storeReducer(store, action = {}) {
       };
 
     case "login_success":
-    case "SET_USER": {  // ✅ Handle both login and signup
+    case "SET_USER": {
+      // ✅ Handle both login and signup
       const { token, user, profile } = action.payload;
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      
+
       // ✅ Store profile if it exists
       if (profile) {
         localStorage.setItem("profile", JSON.stringify(profile));
@@ -44,23 +45,24 @@ export default function storeReducer(store, action = {}) {
         ...store,
         token,
         user,
-        profile: profile || store.profile,  // ✅ Keep existing profile if not provided
+        profile: profile || store.profile, // ✅ Keep existing profile if not provided
       };
     }
 
     case "update_user": {
       // ✅ Check if we're updating user or profile
-      const isProfileUpdate = action.payload.first_name || action.payload.last_name;
-      
+      const isProfileUpdate =
+        action.payload.first_name || action.payload.last_name;
+
       if (isProfileUpdate) {
         // Update profile
         const updatedProfile = {
           ...(store.profile || {}),
           ...(action.payload || {}),
         };
-        
+
         localStorage.setItem("profile", JSON.stringify(updatedProfile));
-        
+
         return {
           ...store,
           profile: updatedProfile,
@@ -84,16 +86,15 @@ export default function storeReducer(store, action = {}) {
     case "logout":
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      localStorage.removeItem("profile");  // ✅ Clear profile too
-
+      localStorage.removeItem("profile");
+      localStorage.removeItem("cart"); // add this
       return {
         ...store,
         token: null,
         user: null,
-        profile: null,  // ✅ Clear profile
+        profile: null,
         cart: [],
       };
-
     case "set_message":
       return {
         ...store,
@@ -106,18 +107,19 @@ export default function storeReducer(store, action = {}) {
         products: action.payload,
       };
 
-    case "add_to_cart":
-      return {
-        ...store,
-        cart: [...store.cart, action.payload],
-      };
+    case "add_to_cart": {
+      const newCart = [...store.cart, action.payload];
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return { ...store, cart: newCart };
+    }
 
-    case "remove_from_cart":
-      return {
-        ...store,
-        cart: store.cart.filter((item) => item.id !== action.payload.id),
-      };
-
+    case "remove_from_cart": {
+      const newCart = store.cart.filter(
+        (item) => item.id !== action.payload.id,
+      );
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return { ...store, cart: newCart };
+    }
     case "admin_add_product":
       return {
         ...store,

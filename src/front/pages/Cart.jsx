@@ -1,3 +1,4 @@
+import { use } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { Link } from "react-router-dom";
 
@@ -6,6 +7,8 @@ export const Cart = () => {
 
     // Calculamos el total con 2 decimales para evitar errores de redondeo de JS
     const total = store.cart.reduce((acumulador, item) => acumulador + item.price, 0).toFixed(2);
+
+
 
     return (
         <div className="container mt-5 mb-5" style={{ minHeight: "70vh" }}>
@@ -30,8 +33,8 @@ export const Cart = () => {
                                     <li key={index} className="list-group-item p-3">
                                         <div className="row align-items-center">
                                             <div className="col-3 col-md-2">
-                                                <img 
-                                                    src={item.image_url} 
+                                                <img
+                                                    src={item.image_url}
                                                     alt={item.name}
                                                     className="img-fluid rounded"
                                                     style={{ objectFit: "cover", aspectRatio: "1/1" }}
@@ -43,7 +46,7 @@ export const Cart = () => {
                                             </div>
                                             <div className="col-4 col-md-4 text-end">
                                                 <span className="fw-bold d-block mb-1">${item.price.toFixed(2)}</span>
-                                                <button 
+                                                <button
                                                     className="btn btn-sm btn-outline-danger border-0"
                                                     title="Eliminar del carrito"
                                                     onClick={() => dispatch({ type: "remove_from_cart", payload: index })} // Usamos index

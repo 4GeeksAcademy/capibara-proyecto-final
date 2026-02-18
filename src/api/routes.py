@@ -131,11 +131,18 @@ def login():
     return jsonify({"access_token": access_token, "user": user.serialize()}), 200
 
 # --- SHOES ---
+@api.route('/shoe/<int:shoe_id>', methods=['GET'])
+def get_shoe(shoe_id):
+    shoe = Shoe.query.get(shoe_id)
+    if not shoe:
+        return jsonify({"msg": "Shoe not found"}), 404
+    return jsonify(shoe.serialize()), 200
 
 @api.route('/shoes', methods=['GET'])
 def get_shoes():
     shoes = Shoe.query.all()
     return jsonify([s.serialize() for s in shoes]), 200
+    
 
 
 @api.route('/shoe', methods=['POST'])
