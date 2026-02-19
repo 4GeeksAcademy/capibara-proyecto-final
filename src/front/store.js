@@ -114,9 +114,7 @@ export default function storeReducer(store, action = {}) {
     }
 
     case "remove_from_cart": {
-      const newCart = store.cart.filter(
-        (item) => item.id !== action.payload.id,
-      );
+      const newCart = store.cart.filter((_, index) => index !== action.payload);
       localStorage.setItem("cart", JSON.stringify(newCart));
       return { ...store, cart: newCart };
     }

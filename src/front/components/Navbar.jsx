@@ -2,32 +2,20 @@ import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Navbar = () => {
-  // Conexion del store para leer el carrito
   const { store, dispatch } = useGlobalReducer();
-  const isLoggedIn = !!store.user; // checa si hay un usuario logueado
+  const isLoggedIn = !!store.user;
+  const isAdmin = !!store?.user?.is_admin; // ⭐ admin check
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch({ type: "logout" });
-    navigate("/login");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    // Use handleNavigate after logout to ensure menu closes
     handleNavigate("/login");
   };
 
-
-  // const handleLogout = () => {
-  //   dispatch({ type: "logout" });
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("user");
-  //   // Use handleNavigate after logout to ensure menu closes
-  //   handleNavigate("/");
-  //};
-
   const handleNavigate = (path) => {
-    // Safely close the offcanvas menu if it is open
     const offcanvasEl = document.getElementById("mainMenu");
     if (window.bootstrap) {
       const bsOffcanvas = window.bootstrap.Offcanvas.getInstance(offcanvasEl);
@@ -39,7 +27,7 @@ export const Navbar = () => {
   return (
     <nav className="navbar navbar-light bg-light sticky-top">
       <div className="container">
-        {/* Brand Link */}
+        {/* Brand */}
         <span
           className="navbar-brand mb-0 h1"
           style={{ cursor: "pointer" }}
@@ -48,9 +36,8 @@ export const Navbar = () => {
           👟 ShoeStore
         </span>
 
-        {/* Desktop buttons and Links */}
+        {/* Desktop buttons */}
         <div className="ms-auto d-flex align-items-center gap-2">
-          {/* Desktop link to About page */}
           <button
             className="btn btn-outline-secondary d-none d-md-block"
             onClick={() => handleNavigate("/shoes")}
@@ -65,6 +52,7 @@ export const Navbar = () => {
             Ver Catálogo
           </button>
 
+          {/* Cart */}
           <button
             className="btn btn-primary position-relative"
             onClick={() => handleNavigate("/cart")}
@@ -77,7 +65,17 @@ export const Navbar = () => {
             )}
           </button>
 
-          {/* Hamburger menu */}
+          {/* ⭐ ADMIN BUTTON (desktop) */}
+          {isAdmin && (
+            <button
+              className="btn btn-warning d-none d-md-block"
+              onClick={() => handleNavigate("/admin")}
+            >
+              <i className="fa-solid fa-shield-halved me-2"></i> Admin
+            </button>
+          )}
+
+          {/* Hamburger */}
           <button
             className="btn btn-primary"
             type="button"
@@ -96,83 +94,55 @@ export const Navbar = () => {
             aria-labelledby="mainMenuLabel"
           >
             <div className="offcanvas-header">
-              <h5 className="offcanvas-title" id="mainMenuLabel">
-                Menu
-              </h5>
+              <h5 className="offcanvas-title">Menu</h5>
               <button
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="offcanvas"
-                aria-label="Close"
               ></button>
             </div>
 
             <div className="offcanvas-body">
               <ul className="navbar-nav">
-                {/* Always visible links */}
                 <li className="nav-item">
-                  <span
-                    className="nav-link"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleNavigate("/")}
-                  >
+                  <span className="nav-link" onClick={() => handleNavigate("/")}>
                     <i className="fa-solid fa-house"></i> Home
                   </span>
                 </li>
+
                 <li className="nav-item">
-                  <span
-                    className="nav-link"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleNavigate("/catalog")}
-                  >
+                  <span className="nav-link" onClick={() => handleNavigate("/catalog")}>
                     <i className="fa-solid fa-store"></i> Catálogo
                   </span>
                 </li>
 
-                {/* Added mobile/offcanvas link to About page */}
                 <li className="nav-item">
-                  <span
-                    className="nav-link"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleNavigate("/shoes")}
-                  >
+                  <span className="nav-link" onClick={() => handleNavigate("/shoes")}>
                     <i className="fa-solid fa-circle-info"></i> Sobre Nosotros
                   </span>
                 </li>
 
                 <hr />
 
-                {/* Conditional links */}
                 {store.user ? (
                   <>
-
                     <li className="nav-item">
-                      <span
-                        className="nav-link"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleNavigate("/editprofile")}
-                      >
+                      <span className="nav-link" onClick={() => handleNavigate("/editprofile")}>
                         <i className="fa-solid fa-user"></i> My Account
                       </span>
                     </li>
-                    <li className="nav-item">
-                      <span
-                        className="nav-link"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleNavigate("/orders")}
-                      >
-                        <i className="fa-solid fa-box"></i> Orders
-                      </span>
-                    </li>
-                    <li className="nav-item">
-                      <span
-                        className="nav-link"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleNavigate("/settings")}
-                      >
-                        <i className="fa-solid fa-gear"></i> Settings
-                      </span>
-                    </li>
+
+                    {/* ⭐ ADMIN LINK (mobile menu) */}
+                    {isAdmin && (
+                      <li className="nav-item">
+                        <span
+                          className="nav-link"
+                          onClick={() => handleNavigate("/admin")}
+                        >
+                          <i className="fa-solid fa-shield-halved"></i> Admin Panel
+                        </span>
+                      </li>
+                    )}
 
                     <hr />
 
@@ -187,23 +157,23 @@ export const Navbar = () => {
                   </>
                 ) : (
                   <>
-                  <li className="nav-item">
-                    <button
-                      className="nav-link btn btn-link"
-                      onClick={() => handleNavigate("/login")}
-                    >
-                      <i className="fa-solid fa-right-to-bracket"></i> Login
-                    </button>
-                  </li>
+                    <li className="nav-item">
+                      <button
+                        className="nav-link btn btn-link"
+                        onClick={() => handleNavigate("/login")}
+                      >
+                        <i className="fa-solid fa-right-to-bracket"></i> Login
+                      </button>
+                    </li>
 
-                  <li className="nav-item">
-                    <button
-                      className="nav-link btn btn-link"
-                      onClick={() => handleNavigate("/signup")}
-                    >
-                      <i className="fa-solid fa-user-plus"></i> Signup
-                    </button>
-                  </li>
+                    <li className="nav-item">
+                      <button
+                        className="nav-link btn btn-link"
+                        onClick={() => handleNavigate("/signup")}
+                      >
+                        <i className="fa-solid fa-user-plus"></i> Signup
+                      </button>
+                    </li>
                   </>
                 )}
               </ul>
