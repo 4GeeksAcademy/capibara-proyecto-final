@@ -10,30 +10,44 @@ export const ProductCard = ({ product }) => {
       type: "add_to_cart",
       payload: product,
     });
-    alert(`${product.name} agregado al carrito!`);
+    alert(`${product.model_name} agregado al carrito!`);
   };
 
   return (
     <div className="card h-100 shadow-sm border-0">
       <img
-        src={product.image_url}
+        src={product.img_url || "https://via.placeholder.com/300"}
         className="card-img-top"
-        alt={product.name}
+        alt={product.model_name}
         style={{ height: "250px", objectFit: "cover" }}
       />
+
       <div className="card-body d-flex flex-column">
-        <h5 className="card-title">{product.name}</h5>
+        <h5 className="card-title">
+          {product.brand}
+        </h5>
+
         <p className="card-text text-muted flex-grow-1">
-          {product.description || "Descripción breve del zapato."}
+          {product.model_name}
         </p>
+
         <div className="d-flex justify-content-between align-items-center mt-3">
-          <span className="h5 mb-0 text-primary">${product.price}</span>
+          <span className="h5 mb-0 text-primary">
+            ${parseFloat(product.price).toFixed(2)}
+          </span>
+
           <div>
-            {/* Updated route to point to /shoe/:id */}
-            <Link to={`/shoe/${product.id}`} className="btn btn-outline-secondary btn-sm me-2">
+            <Link
+              to={`/shoe/${product.id}`}
+              className="btn btn-outline-secondary btn-sm me-2"
+            >
               Ver más
             </Link>
-            <button className="btn btn-dark btn-sm" onClick={addToCart}>
+
+            <button
+              className="btn btn-dark btn-sm"
+              onClick={addToCart}
+            >
               <i className="fa-solid fa-cart-plus"></i> Agregar
             </button>
           </div>
@@ -42,3 +56,4 @@ export const ProductCard = ({ product }) => {
     </div>
   );
 };
+
