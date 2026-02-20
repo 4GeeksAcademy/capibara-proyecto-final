@@ -8,13 +8,13 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Login } from "./pages/Login";
-import { Catalog } from "./pages/Catalog"; 
-import { Cart } from "./pages/Cart";       
+import { Catalog } from "./pages/Catalog";
+import { Cart } from "./pages/Cart";
 import { Checkout } from "./pages/Checkout";
 // import {Profile} from "./pages/Profile";
 import { AdminLogin } from "./pages/AdminLogin";
-import { Shoes } from "./pages/Shoes"; 
-import { Shoe } from "./pages/Shoe"; 
+import { Shoes } from "./pages/Shoes";
+
 import { Signup } from "./pages/Signup";
 import { EditProfile } from "./pages/EditProfile";
 import { Admin } from "./pages/Admin";
@@ -25,7 +25,7 @@ export const router = createBrowserRouter(
 
             {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
             <Route path="/" element={<Home />} />
-            
+
             {/* Ruta del Catálogo */}
             <Route path="/catalog" element={<Catalog />} />
 
@@ -34,15 +34,15 @@ export const router = createBrowserRouter(
             <Route path="/checkout" element={<Checkout />} />
 
             {/* He cambiado "/single/" por "/product/" para que coincida con el ProductCard */}
-            <Route path="/product/:theId" element={<Single />} /> 
-            
+            <Route path="/product/:theId" element={<Single />} />
+
             <Route path="/login" element={<Login />} />
-            
+
 
             {/* <Route path="/profile" element={<Profile />} /> */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/shoes" element={<Shoes />} />
-            <Route path="/shoe/:theId" element={<Shoe />} />
+
             <Route path="/signup" element={<Signup />} />
             <Route path="/editprofile" element={<EditProfile />} />
             <Route path="/admin" element={<Admin />} />
