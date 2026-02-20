@@ -37,12 +37,11 @@ export const ProductCard = ({ product }) => {
           </span>
 
           <div>
-            <Link
-              to={`/shoe/${product.id}`}
-              className="btn btn-outline-secondary btn-sm me-2"
-            >
-              Ver más
-            </Link>
+            
+              
+            
+              
+            
 
             <button
               className="btn btn-dark btn-sm"
