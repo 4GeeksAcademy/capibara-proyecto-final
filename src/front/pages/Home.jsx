@@ -80,7 +80,7 @@ export const Home = () => {
         <div className="carousel-inner">
           <div className="carousel-item active">
             <img
-              src="https://images.unsplash.com/photo-1556906781-9a412961d28c?q=80&w=1200&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1600&q=80"
               className="d-block w-100"
               style={{ height: "500px", objectFit: "cover", filter: "brightness(0.7)" }}
               alt="Urban Shoes"
